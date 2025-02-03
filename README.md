@@ -1,7 +1,7 @@
 # GEOG-YifanYang-GEOG678
 | Homework     | Labs     | Project     |
 | :----------: | :-------:| :---------: |
-| [week01](Homework/week01/README.md)   | [week01](LLabs/week01)|                    |
+| [week01](Homework/week01/README.md)   | [week01](Labs/week01)|                    |
 | [week02](Homework/week02/README.md)   | [week02](Lab/week02/README.md)|                    |
 | [week03](Homework/week03/README.md)   | [week03](Lab/week03/README.md)|                    |
 | [week04](Homework/week04/README.md)   | [week04](Lab/week04/README.md)|                    |
