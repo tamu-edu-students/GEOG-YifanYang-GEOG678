@@ -1,4 +1,4 @@
-# GEOG-SheidaGhahremani-GEOG678
+# GEOG-YifanYang-GEOG678
 | Homework     | Labs     | Project     |
 | :----------: | :-------:| :---------: |
 | [week01](Homework/week01/README.md)   | [week01](Lab/week01/README.md)|                    |
