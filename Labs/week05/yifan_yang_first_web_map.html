@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Yifan Yang First Web Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+    <style>
+        #map { height: 600px; }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<!-- Leaflet JavaScript -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // Create the map
+    var map = L.map('map');
+
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Zoom map to user's location
+    map.locate({setView: true, maxZoom: 15});
+
+    // Circle around Kyle Field
+    var kyleField = L.circle([30.6100, -96.3404], {
+        color: 'maroon',
+        fillColor: '#f03',
+        fillOpacity: 0.5,
+        radius: 200
+    }).addTo(map).bindPopup("Kyle Field");
+
+    // Define custom icon class
+    var CustomIcon = L.Icon.extend({
+        options: {
+            iconSize: [32, 32],
+            iconAnchor: [16, 32],
+            popupAnchor: [0, -32]
+        }
+    });
+
+    var omIcon = new CustomIcon({iconUrl: 'om-icon.png'});
+    var acadIcon = new CustomIcon({iconUrl: 'acad-icon.png'});
+
+    // O&M Building
+    L.marker([30.6154, -96.3401], {icon: omIcon}).addTo(map).bindPopup("O&M Building");
+
+    // Academic Building
+    L.marker([30.6174, -96.3368], {icon: acadIcon}).addTo(map).bindPopup("Academic Building");
+
+    // Popup showing coordinates on click
+    function onMapClick(e) {
+        L.popup()
+            .setLatLng(e.latlng)
+            .setContent("You clicked the map at " + e.latlng.toString())
+            .openOn(map);
+    }
+
+    map.on('click', onMapClick);
+
+</script>
+
+</body>
+</html>
