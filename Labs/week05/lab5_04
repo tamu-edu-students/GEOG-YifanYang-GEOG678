@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Yifan's First Web Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <style>
+        body { margin: 0; padding: 0; }
+        html, body, #map { height: 100%; width: 100vw; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script>
+        var map = L.map('map').fitWorld(); // Initialize map to fit world view
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        // Locate user and zoom into their position
+        map.locate({ setView: true, maxZoom: 16 });
+
+        // Circle around Kyle Field
+        var kyleField = L.circle([30.6103, -96.3403], {
+            color: 'blue',
+            fillColor: '#30f',
+            fillOpacity: 0.5,
+            radius: 300
+        }).addTo(map).bindPopup("Kyle Field - Texas A&M Stadium");
+
+        // Custom Icon Definitions
+        var buildingIcon = L.icon({
+            iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/6b/Building_icon.svg',
+            iconSize: [40, 40],
+            iconAnchor: [20, 40],
+            popupAnchor: [0, -30]
+        });
+
+        // O&M Building Marker
+        var omBuilding = L.marker([30.6195, -96.3385], {icon: buildingIcon}).addTo(map)
+            .bindPopup("<b>O&M Building</b><br>Department of Atmospheric Sciences");
+
+        // Academic Building Marker
+        var academicBuilding = L.marker([30.6189, -96.3418], {icon: buildingIcon}).addTo(map)
+            .bindPopup("<b>Academic Building</b><br>Historic landmark at Texas A&M");
+
+        // Popup to show clicked coordinates
+        var popup = L.popup();
+
+        function onMapClick(e) {
+            popup.setLatLng(e.latlng)
+                .setContent("You clicked at: " + e.latlng.toString())
+                .openOn(map);
+        }
+
+        map.on('click', onMapClick);
+
+        // Handle location found
+        function onLocationFound(e) {
+            var radius = e.accuracy;
+            L.marker(e.latlng).addTo(map)
+                .bindPopup("You are within " + Math.round(radius) + " meters from this point").openPopup();
+            L.circle(e.latlng, {radius: radius}).addTo(map);
+        }
+
+        map.on('locationfound', onLocationFound);
+
+        // Handle location error
+        function onLocationError(e) {
+            alert("Location access denied. Showing default map view.");
+            map.setView([30.6185, -96.3365], 15);
+        }
+
+        map.on('locationerror', onLocationError);
+    </script>
+</body>
+</html>
