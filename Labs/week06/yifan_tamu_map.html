@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Yifan Yang TAMU Map</title>
+      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+      <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+      <script src='TAMU_Building.js'></script>
+      <link rel="stylesheet" type="text/css" href="Final.css" />
+      <h1>Yifan Yang TAMU Campus Map</h1>
+      <style>
+          /* Add custom styles if needed */
+          .info {
+              padding: 8px;
+              background: white;
+              box-shadow: 0 0 15px rgba(0,0,0,0.2);
+              border-radius: 5px;
+          }
+      </style>
+   </head>
+   <body>
+      <div id="mapid" style="height:580px"></div>
+      <script>
+        var mymap = L.map('mapid').setView([30.615, -96.340331], 15);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 25
+        }).addTo(mymap);
+
+        var mystyle = {
+            weight: 1,
+            opacity: 1,
+            color: 'maroon',
+            fillOpacity: 0.5
+        };   
+
+        function highlightFeature(e) {
+            var layer = e.target;
+            layer.setStyle({
+                weight: 5,
+                color: '#666',
+                dashArray: '',
+                fillOpacity: 0.7
+            });
+
+            layer.bringToFront();
+            info.update(layer.feature.properties);
+        }
+
+        function resetHighlight(e) {
+            geojson.resetStyle(e.target);
+            info.update();
+        }
+
+        function onEachFeature(feature, layer) {
+            layer.on({
+                mouseover: highlightFeature,
+                mouseout: resetHighlight,
+                click: zoomToFeature
+            });
+        }
+
+        function zoomToFeature(e) {
+            mymap.fitBounds(e.target.getBounds());
+        }
+
+        geojson = L.geoJson(tamu, {
+            style: mystyle,
+            onEachFeature: onEachFeature
+        }).addTo(mymap);
+
+        var info = L.control();
+
+        info.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'info'); 
+            this.update();
+            return this._div;
+        };
+
+        info.update = function (props) {
+            this._div.innerHTML = (props ?
+                '<b>' + props.BldgName + '</b> (' + props.BldgAbbr + ')'
+                : '<b>Hover over a building</b>');
+        };
+
+        info.addTo(mymap);
+      </script>
+   </body>
+</html>
