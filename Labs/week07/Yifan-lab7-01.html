@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Weekly Temperature in College Station</title>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <style>
+    #container {
+      width: 90%;
+      max-width: 800px;
+      margin: 50px auto;
+    }
+  </style>
+</head>
+<body>
+
+<div id="container"></div>
+
+<script>
+Highcharts.chart('container', {
+  chart: {
+    type: 'line'
+  },
+  title: {
+    text: 'Weekly Temperature in College Station'
+  },
+  xAxis: {
+    categories: ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  },
+  yAxis: {
+    title: {
+      text: 'Temperature (°F)'
+    },
+    max: 90,
+    min: 40
+  },
+  tooltip: {
+    enabled: false
+  },
+  plotOptions: {
+    series: {
+      dataLabels: {
+        enabled: true,
+        formatter: function () {
+          if (this.series.name === 'Highest (°F)' && this.point.x === 2) {
+            return '<b>' + this.y + '</b><br><span style="color:#007bff">Highest</span>';
+          } else if (this.series.name === 'Lowest (°F)' && this.point.x === 0) {
+            return '<b>' + this.y + '</b><br><span style="color:#000">Lowest</span>';
+          } else {
+            return '<b>' + this.y + '</b>';
+          }
+        },
+        style: {
+          fontWeight: 'bold'
+        }
+      },
+      marker: {
+        enabled: true,
+        radius: 5
+      }
+    }
+  },
+  series: [{
+    name: 'Highest (°F)',
+    color: '#80bfff',
+    data: [82, 81, 81, 70, 77, 78, 79, 80]
+  }, {
+    name: 'Lowest (°F)',
+    color: '#000',
+    data: [67, 59, 50, 47, 51, 60, 66, 66],
+    marker: {
+      symbol: 'diamond'
+    }
+  }]
+});
+</script>
+
+</body>
+</html>

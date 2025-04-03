@@ -1,0 +1,106 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>College Station Weekly Temperature Forecast</title>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    #highcharts-container, #d3-container {
+      width: 100%;
+      max-width: 800px;
+      margin: 40px auto;
+    }
+    svg {
+      font: 10px sans-serif;
+    }
+  </style>
+</head>
+<body>
+
+  <h2 style="text-align:center">Highcharts Visualization</h2>
+  <div id="highcharts-container"></div>
+
+  <h2 style="text-align:center">D3.js Visualization</h2>
+  <div id="d3-container"></div>
+
+  <script>
+    // Highcharts Line Chart
+    Highcharts.chart('highcharts-container', {
+      chart: { type: 'spline' },
+      title: { text: 'College Station Weekly Temperature Forecast' },
+      xAxis: {
+        categories: ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+      },
+      yAxis: {
+        title: { text: 'Temperature (°F)' }
+      },
+      series: [{
+        name: 'Highest (°F)',
+        data: [82, 81, 81, 70, 77, 78, 79, 80]
+      }, {
+        name: 'Lowest (°F)',
+        data: [67, 59, 50, 47, 51, 60, 66, 66]
+      }]
+    });
+
+    // D3 Area Chart
+    const data = [
+      { day: "Sat", high: 82, low: 67 },
+      { day: "Sun", high: 81, low: 59 },
+      { day: "Mon", high: 81, low: 50 },
+      { day: "Tue", high: 70, low: 47 },
+      { day: "Wed", high: 77, low: 51 },
+      { day: "Thu", high: 78, low: 60 },
+      { day: "Fri", high: 79, low: 66 },
+      { day: "Sat", high: 80, low: 66 }
+    ];
+
+    const margin = { top: 20, right: 30, bottom: 30, left: 40 },
+          width = 800 - margin.left - margin.right,
+          height = 400 - margin.top - margin.bottom;
+
+    const svg = d3.select("#d3-container")
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    const x = d3.scalePoint()
+      .domain(data.map(d => d.day))
+      .range([0, width]);
+
+    const y = d3.scaleLinear()
+      .domain([40, d3.max(data, d => d.high)]).nice()
+      .range([height, 0]);
+
+    const area = d3.area()
+      .x(d => x(d.day))
+      .y0(d => y(d.low))
+      .y1(d => y(d.high));
+
+    svg.append("path")
+      .datum(data)
+      .attr("fill", "steelblue")
+      .attr("opacity", 0.4)
+      .attr("d", area);
+
+    svg.append("g")
+      .attr("transform", `translate(0,${height})`)
+      .call(d3.axisBottom(x));
+
+    svg.append("g")
+      .call(d3.axisLeft(y));
+
+    svg.append("text")
+      .attr("x", width / 2)
+      .attr("y", -10)
+      .attr("text-anchor", "middle")
+      .style("font-size", "16px")
+      .text("College Station Weekly Temperature Range (D3.js)");
+  </script>
+
+</body>
+</html>
