@@ -22,4 +22,4 @@ Toggle visibility of each safety layer
 🖼️ Legend
 Explanation of icon meanings
 
-![Uploading image.png…]()
+Project/final_map.png
