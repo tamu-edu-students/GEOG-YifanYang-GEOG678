@@ -22,4 +22,9 @@ Toggle visibility of each safety layer
 🖼️ Legend
 Explanation of icon meanings
 
-Project/final_map.png
+## Final Map
+
+This is the final output map of our project:
+
+![Final Map](https://raw.githubusercontent.com/tamu-edu-students/GEOG-YifanYang-GEOG678/main/Project/final_map.png)
+
