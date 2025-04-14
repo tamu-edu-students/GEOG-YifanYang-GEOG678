@@ -64,9 +64,9 @@
   <div class="legend" id="legend">
     <strong>Legend</strong><br>
     <img src="https://cdn-icons-png.flaticon.com/512/212/212298.png" width="20"> Emergency Call Boxes<br>
-    <img src="https://cdn-icons-png.flaticon.com/512/6812/6812339.png" width="20"> Poorly Lit Areas<br>
     <img src="https://cdn-icons-png.flaticon.com/512/1039/1039532.png" width="20"> Security Cameras<br>
     <img src="https://cdn-icons-png.flaticon.com/512/854/854894.png" width="20"> Pedestrian Routes<br>
+    <img src="https://cdn-icons-png.flaticon.com/512/6812/6812339.png" width="20"> Poorly Lit Areas<br>
     <img src="https://cdn-icons-png.flaticon.com/512/6868/6868953.png" width="20"> HeatMap: Green = Safe Areas, Red = Unsafe Areas
   </div>
 
@@ -105,15 +105,15 @@
 
     var icons = {
       emergency: L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/212/212298.png', iconSize: [25, 25] }),
-      lighting: L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/6812/6812339.png', iconSize: [25, 25] }),
       camera: L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/1039/1039532.png', iconSize: [25, 25] }),
-      pedestrian: L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/854/854894.png', iconSize: [25, 25] })
+      pedestrian: L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/854/854894.png', iconSize: [25, 25] }),
+      lighting: L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/6812/6812339.png', iconSize: [25, 25] })
     };
 
     var emergencyLayer = styleLayer('https://services1.arcgis.com/qr14biwnHA6Vis6l/arcgis/rest/services/Campus_Safety_Layer/FeatureServer/0', icons.emergency, 'red');
-    var lightingLayer = styleLayer('https://services1.arcgis.com/qr14biwnHA6Vis6l/arcgis/rest/services/Campus_Safety_Layer/FeatureServer/1', icons.lighting, 'orange');
     var cameraLayer = styleLayer('https://services1.arcgis.com/qr14biwnHA6Vis6l/arcgis/rest/services/Campus_Safety_Layer/FeatureServer/2', icons.camera, 'blue');
     var pedestrianLayer = styleLayer('https://services1.arcgis.com/qr14biwnHA6Vis6l/arcgis/rest/services/Campus_Safety_Layer/FeatureServer/3', icons.pedestrian, 'green');
+    var lightingLayer = styleLayer('https://services1.arcgis.com/qr14biwnHA6Vis6l/arcgis/rest/services/Campus_Safety_Layer/FeatureServer/1', icons.lighting, 'orange');
 
     // Add security camera layer to map (largest extent layer)
     cameraLayer.addTo(map);
@@ -146,38 +146,38 @@
 
     // Emergency Call Boxes weight = 0.9
     emergencyLayer.on('load', function() {
-    emergencyLayer.eachFeature(function(layer) {
-        heatPoints.push([layer.getLatLng().lat, layer.getLatLng().lng, 0.9]);
-    });
+      emergencyLayer.eachFeature(function(layer) {
+          heatPoints.push([layer.getLatLng().lat, layer.getLatLng().lng, 0.9]);
+      });
     });
 
     // Security Cameras weight = 0.7
     cameraLayer.on('load', function() {
-    cameraLayer.eachFeature(function(layer) {
-        heatPoints.push([layer.getLatLng().lat, layer.getLatLng().lng, 0.7]);
-    });
+      cameraLayer.eachFeature(function(layer) {
+          heatPoints.push([layer.getLatLng().lat, layer.getLatLng().lng, 0.7]);
+      });
     });
 
     // Pedestrian Routes weight = 0.5
     pedestrianLayer.on('load', function() {
-    pedestrianLayer.eachFeature(function(layer) {
-        var coords = layer.feature.geometry.coordinates;
-        for (var i = 0; i < coords.length; i += 5) {
-        var coord = coords[i];
-        var lat = coord[1];
-        var lng = coord[0];
-        heatPoints.push([lat, lng, 0.5]);
-        }
-    });
+      pedestrianLayer.eachFeature(function(layer) {
+          var coords = layer.feature.geometry.coordinates;
+          for (var i = 0; i < coords.length; i += 5) {
+          var coord = coords[i];
+          var lat = coord[1];
+          var lng = coord[0];
+          heatPoints.push([lat, lng, 0.5]);
+          }
+      });
     });
 
     // Poorly Lit Areas weight = 0.2
     lightingLayer.on('load', function() {
-    lightingLayer.eachFeature(function(layer) {
-        var bounds = layer.getBounds();
-        var center = bounds.getCenter();
-        heatPoints.push([center.lat, center.lng, 0.2]);
-    });
+      lightingLayer.eachFeature(function(layer) {
+          var bounds = layer.getBounds();
+          var center = bounds.getCenter();
+          heatPoints.push([center.lat, center.lng, 0.2]);
+      });
     });
 
     var heat;
@@ -198,9 +198,9 @@
 
     L.control.layers(null, {
       "Emergency Call Boxes": emergencyLayer,
-      "Poorly Lit Areas": lightingLayer,
       "Security Cameras": cameraLayer,
       "High-Traffic Pedestrian Routes": pedestrianLayer,
+      "Poorly Lit Areas": lightingLayer,
       "Heatmap (Safety Intensity)": heat
     }, { collapsed: false }).addTo(map);
 

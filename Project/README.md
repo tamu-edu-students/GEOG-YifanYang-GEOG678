@@ -6,38 +6,19 @@ Our project is an interactive web-based map that visualizes safety features acro
 
 Feature Overview:
 
-Our webmap uses Leaflet JS with an OpenStreetMap basemap to implement our map.The map uses 4 feature layers from that were manually collected and uploaded using ArcGIS. They include 4 safety categories: 
+Our webmap uses Leaflet JS with an OpenStreetMap basemap to implement our map. The map uses 4 feature layers that were manually collected and uploaded using ArcGIS Field Maps and ArcGIS Online. They include 4 safety categories: 
 
 * Emergency Phone Boxes
 * Security Cameras
 * High Foot Traffic Routes
 * Poorly Lit Areas
 
-In terms of Features we've added the search feature that allows you to find the location as well as popups that show the attribute details of markers. We've implemented custom icons. We've also implemented layer control so the user can toggle visibility of each safety layer As well as a legend.
+In terms of Features we've added: 
 
-* 🗺️ Leaflet Basemap
-Interactive map using OpenStreetMap tiles
-
-* 📌 ArcGIS Feature Layers
-4 feature layers for safety categories (call boxes, lighting, cameras, etc)
-
-* 🧭 Geocoder
-Allows address/place search and zoom
-
-* 🔍 Popups
-Clickable map markers show full feature attribute details
-
-* 🧊 Custom Icons
-Unique icon per layer (emergency, camera, lighting, pedestrian)
-
-* 🌈 Layer Styling
-Colored markers & styles based on layer purpose
-
-* 📜 Layer Control
-Toggle visibility of each safety layer
-
-* 🖼️ Legend
-Explanation of icon meanings
+* A search Box to find specific locations
+* Popups that show the attribute details of markers
+* A legend with custom icons
+* Layer control that allows the user to toggle visibility of each safety layer
 
 ## Final Map
 
