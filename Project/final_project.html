@@ -66,7 +66,8 @@
     <img src="https://cdn-icons-png.flaticon.com/512/212/212298.png" width="20"> Emergency Call Boxes<br>
     <img src="https://cdn-icons-png.flaticon.com/512/6812/6812339.png" width="20"> Poorly Lit Areas<br>
     <img src="https://cdn-icons-png.flaticon.com/512/1039/1039532.png" width="20"> Security Cameras<br>
-    <img src="https://cdn-icons-png.flaticon.com/512/854/854894.png" width="20"> Pedestrian Routes
+    <img src="https://cdn-icons-png.flaticon.com/512/854/854894.png" width="20"> Pedestrian Routes<br>
+    <img src="d2e2ksp-e68766e2-0d2f-438c-87ac-.png" width="20"> HeatMap: Green = Safe Areas, Red = Unsafe Areas
   </div>
 
   <div id="map"></div>
@@ -141,55 +142,48 @@
       })
       .addTo(map);
 
-    L.control.layers(null, {
-      "Emergency Call Boxes": emergencyLayer,
-      "Poorly Lit Areas": lightingLayer,
-      "Security Cameras": cameraLayer,
-      "High-Traffic Pedestrian Routes": pedestrianLayer
-    }, { collapsed: false }).addTo(map);
-
-    // Heatmap data collection array
     var heatPoints = [];
 
-    // Emergency Call Boxes (weight 0.9 = strong safe zone)
+    // Emergency Call Boxes weight = 0.9
     emergencyLayer.on('load', function() {
     emergencyLayer.eachFeature(function(layer) {
         heatPoints.push([layer.getLatLng().lat, layer.getLatLng().lng, 0.9]);
     });
     });
 
-    // Security Cameras (weight 0.7)
+    // Security Cameras weight = 0.7
     cameraLayer.on('load', function() {
     cameraLayer.eachFeature(function(layer) {
         heatPoints.push([layer.getLatLng().lat, layer.getLatLng().lng, 0.7]);
     });
     });
 
-    // Pedestrian Routes (polyline sampling)
+    // Pedestrian Routes weight = 0.5
     pedestrianLayer.on('load', function() {
     pedestrianLayer.eachFeature(function(layer) {
         var coords = layer.feature.geometry.coordinates;
         for (var i = 0; i < coords.length; i += 5) {
         var coord = coords[i];
-        var lat = coord[1]; // GeoJSON is [lng, lat]
+        var lat = coord[1];
         var lng = coord[0];
-        heatPoints.push([lat, lng, 0.5]); // less intense
+        heatPoints.push([lat, lng, 0.5]);
         }
     });
     });
 
-    // Poorly Lit Areas (polygon centroids = unsafe, low weight)
+    // Poorly Lit Areas weight = 0.2
     lightingLayer.on('load', function() {
     lightingLayer.eachFeature(function(layer) {
         var bounds = layer.getBounds();
         var center = bounds.getCenter();
-        heatPoints.push([center.lat, center.lng, 0.2]); // unsafe zone
+        heatPoints.push([center.lat, center.lng, 0.2]);
     });
     });
 
-    // Wait until layers are loaded, then add heatmap
+    var heat;
+
     setTimeout(function() {
-    var heat = L.heatLayer(heatPoints, {
+    heat = L.heatLayer(heatPoints, {
         radius: 45,
         blur: 35,
         maxZoom: 20,
@@ -201,8 +195,16 @@
         0.8: 'lime'
         }
     }).addTo(map);
-    }, 2000); // Delay gives time for all layers to finish loading
 
+    L.control.layers(null, {
+      "Emergency Call Boxes": emergencyLayer,
+      "Poorly Lit Areas": lightingLayer,
+      "Security Cameras": cameraLayer,
+      "High-Traffic Pedestrian Routes": pedestrianLayer,
+      "Heatmap (Safety Intensity)": heat
+    }, { collapsed: false }).addTo(map);
+
+    }, 2000);
 
   </script>
 </body>
