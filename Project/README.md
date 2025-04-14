@@ -1,25 +1,33 @@
 # Project Folder
 
-📌 Feature Overview:
-Feature
-Description
-🗺️ Leaflet Basemap
+Feature Overview:
+Feature Description
+
+* 🗺️ Leaflet Basemap
 Interactive map using OpenStreetMap tiles
-📌 ArcGIS Feature Layers
+
+* 📌 ArcGIS Feature Layers
 4 feature layers for safety categories (call boxes, lighting, cameras, etc)
-📍 Geolocation
+  
+* 📍 Geolocation
 Automatically centers map on user's current location
-🧭 Geocoder
+
+* 🧭 Geocoder
 Allows address/place search and zoom
-🔍 Popups
+
+* 🔍 Popups
 Clickable map markers show full feature attribute details
-🧊 Custom Icons
+
+* 🧊 Custom Icons
 Unique icon per layer (emergency, camera, lighting, pedestrian)
-🌈 Layer Styling
+
+* 🌈 Layer Styling
 Colored markers & styles based on layer purpose
-📜 Layer Control
+
+* 📜 Layer Control
 Toggle visibility of each safety layer
-🖼️ Legend
+
+* 🖼️ Legend
 Explanation of icon meanings
 
 ## Final Map
