@@ -8,6 +8,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/esri-leaflet@3.0.11/dist/esri-leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
   <style>
     body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
@@ -71,27 +72,14 @@
   <div id="map"></div>
 
   <script>
-    // testing
-    var map = L.map('map').fitWorld();
-    map.locate({ setView: true, maxZoom: 17 });
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
+    var map = L.map('map', {
+        zoomControl: false
+    }).fitWorld();
+    
+    // Move zoom control from topright deafult to bottomleft
+    L.control.zoom({
+        position: 'bottomright'
     }).addTo(map);
-
-    L.Control.geocoder({ defaultMarkGeocode: false })
-      .on('markgeocode', function(e) {
-        map.setView(e.geocode.center, 17);
-        L.marker(e.geocode.center).addTo(map).bindPopup(e.geocode.name).openPopup();
-      })
-      .addTo(map);
-
-    var icons = {
-      emergency: L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/595/595067.png', iconSize: [25, 25] }),
-      lighting: L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/891/891462.png', iconSize: [25, 25] }),
-      camera: L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/715/715676.png', iconSize: [25, 25] }),
-      pedestrian: L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/854/854894.png', iconSize: [25, 25] })
-    };
 
     function styleLayer(url, icon, color) {
       return L.esri.featureLayer({
@@ -114,10 +102,44 @@
       });
     }
 
+    var icons = {
+      emergency: L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/595/595067.png', iconSize: [25, 25] }),
+      lighting: L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/891/891462.png', iconSize: [25, 25] }),
+      camera: L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/715/715676.png', iconSize: [25, 25] }),
+      pedestrian: L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/854/854894.png', iconSize: [25, 25] })
+    };
+
     var emergencyLayer = styleLayer('https://services1.arcgis.com/qr14biwnHA6Vis6l/arcgis/rest/services/Campus_Safety_Layer/FeatureServer/0', icons.emergency, 'red');
     var lightingLayer = styleLayer('https://services1.arcgis.com/qr14biwnHA6Vis6l/arcgis/rest/services/Campus_Safety_Layer/FeatureServer/1', icons.lighting, 'orange');
     var cameraLayer = styleLayer('https://services1.arcgis.com/qr14biwnHA6Vis6l/arcgis/rest/services/Campus_Safety_Layer/FeatureServer/2', icons.camera, 'blue');
     var pedestrianLayer = styleLayer('https://services1.arcgis.com/qr14biwnHA6Vis6l/arcgis/rest/services/Campus_Safety_Layer/FeatureServer/3', icons.pedestrian, 'green');
+
+    // Add security camera layer to map (largest extent layer)
+    cameraLayer.addTo(map);
+
+    // Query the bounding box directly from the server and zoom
+    cameraLayer.query().bounds(function(error, latlngbounds) {
+    if (!error) {
+        map.fitBounds(latlngbounds);
+    } else {
+        console.error("Error fetching layer bounds:", error);
+    }
+    });
+
+    emergencyLayer.addTo(map);
+    lightingLayer.addTo(map);
+    pedestrianLayer.addTo(map);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    L.Control.geocoder({ defaultMarkGeocode: false })
+      .on('markgeocode', function(e) {
+        map.setView(e.geocode.center, 17);
+        L.marker(e.geocode.center).addTo(map).bindPopup(e.geocode.name).openPopup();
+      })
+      .addTo(map);
 
     L.control.layers(null, {
       "Emergency Call Boxes": emergencyLayer,
@@ -126,10 +148,62 @@
       "High-Traffic Pedestrian Routes": pedestrianLayer
     }, { collapsed: false }).addTo(map);
 
-    emergencyLayer.addTo(map);
-    lightingLayer.addTo(map);
-    cameraLayer.addTo(map);
-    pedestrianLayer.addTo(map);
+    // Heatmap data collection array
+    var heatPoints = [];
+
+    // Emergency Call Boxes (weight 0.9 = strong safe zone)
+    emergencyLayer.on('load', function() {
+    emergencyLayer.eachFeature(function(layer) {
+        heatPoints.push([layer.getLatLng().lat, layer.getLatLng().lng, 0.9]);
+    });
+    });
+
+    // Security Cameras (weight 0.7)
+    cameraLayer.on('load', function() {
+    cameraLayer.eachFeature(function(layer) {
+        heatPoints.push([layer.getLatLng().lat, layer.getLatLng().lng, 0.7]);
+    });
+    });
+
+    // Pedestrian Routes (polyline sampling)
+    pedestrianLayer.on('load', function() {
+    pedestrianLayer.eachFeature(function(layer) {
+        var coords = layer.feature.geometry.coordinates;
+        for (var i = 0; i < coords.length; i += 5) {
+        var coord = coords[i];
+        var lat = coord[1]; // GeoJSON is [lng, lat]
+        var lng = coord[0];
+        heatPoints.push([lat, lng, 0.5]); // less intense
+        }
+    });
+    });
+
+    // Poorly Lit Areas (polygon centroids = unsafe, low weight)
+    lightingLayer.on('load', function() {
+    lightingLayer.eachFeature(function(layer) {
+        var bounds = layer.getBounds();
+        var center = bounds.getCenter();
+        heatPoints.push([center.lat, center.lng, 0.2]); // unsafe zone
+    });
+    });
+
+    // Wait until layers are loaded, then add heatmap
+    setTimeout(function() {
+    var heat = L.heatLayer(heatPoints, {
+        radius: 45,
+        blur: 35,
+        maxZoom: 20,
+        minOpacity: 0.4,
+        gradient: {
+        0.2: 'red',
+        0.4: 'orange',
+        0.6: 'yellow',
+        0.8: 'lime'
+        }
+    }).addTo(map);
+    }, 2000); // Delay gives time for all layers to finish loading
+
+
   </script>
 </body>
 </html>
