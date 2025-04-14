@@ -171,14 +171,14 @@
       });
     });
 
-    // Poorly Lit Areas weight = 0.2
-    lightingLayer.on('load', function() {
-      lightingLayer.eachFeature(function(layer) {
-          var bounds = layer.getBounds();
-          var center = bounds.getCenter();
-          heatPoints.push([center.lat, center.lng, 0.2]);
-      });
-    });
+    // // Poorly Lit Areas weight = 0.2
+    // lightingLayer.on('load', function() {
+    //   lightingLayer.eachFeature(function(layer) {
+    //       var bounds = layer.getBounds();
+    //       var center = bounds.getCenter();
+    //       heatPoints.push([center.lat, center.lng, 0.2]);
+    //   });
+    // });
 
     var heat;
 
